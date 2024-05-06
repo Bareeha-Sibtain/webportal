@@ -1,0 +1,51 @@
+import React, { useEffect, useState } from 'react';
+import { auth, db, messaging, realTimeDb } from '../firebase/firebase'; // make sure this path is correct
+import { ref, onValue, off } from "firebase/database";
+
+const NotificationModal = ({ show, title, message }) => {
+  if (!show) return null;
+
+  return (
+    <div style={{ position: 'fixed', top: '20%', left: '50%', transform: 'translate(-50%, -50%)', width: '300px', backgroundColor: 'white', padding: '20px', borderRadius: '10px', boxShadow: '0px 0px 10px rgba(0,0,0,0.2)' }}>
+      <h4>{title}</h4>
+      <p>{message}</p>
+      
+    </div>
+  );
+};
+
+const Header = () => {
+  const [showModal, setShowModal] = useState(false);
+  const [notification, setNotification] = useState({ title: '', message: '' });
+
+  useEffect(() => {
+    const deviceRef = ref(realTimeDb, 'Device');
+    const onValueChange = onValue(deviceRef, snapshot => {
+      const devices = snapshot.val();
+      for (let home in devices) {
+        const { motion, sound } = devices[home];
+        if (motion.value === 1 || sound.value === 1) {
+          setNotification({
+            title: 'Alert',
+            message: `Motion detected at ${home}. Location: ${devices[home].location || 'unknown'}`
+          });
+          setShowModal(true);
+        }
+      }
+    });
+
+    return () => off(deviceRef, 'value', onValueChange);
+  }, []);
+
+  return (
+    <>
+      <NotificationModal
+        show={showModal}
+        title={notification.title}
+        message={notification.message}
+      />
+    </>
+  );
+};
+
+export default Header;
