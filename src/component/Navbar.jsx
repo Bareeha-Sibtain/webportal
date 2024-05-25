@@ -24,7 +24,7 @@ const Navbar = () => {
 
   return (
     <nav className="bg-gray-800 text-white p-4 flex justify-between">
-      <h1 className="font-bold">Theftuard</h1>
+      <h1 className="font-bold">TheftGuard</h1>
       <ul className="flex space-x-4">
         {currentUser ? (
           <>

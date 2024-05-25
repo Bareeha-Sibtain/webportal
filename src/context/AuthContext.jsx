@@ -1,34 +1,36 @@
-// src/context/AuthContext.js
 import React, { createContext, useContext, useState, useEffect } from 'react';
-import { auth } from '../firebase/firebase'; // Adjust this path as necessary
-import { onAuthStateChanged } from "firebase/auth";
+import { getAuth, onAuthStateChanged } from 'firebase/auth';
 
 const AuthContext = createContext();
 
-export function useAuth() {
-  return useContext(AuthContext);
-}
-
 export function AuthProvider({ children }) {
   const [currentUser, setCurrentUser] = useState(null);
-  const [loading, setLoading] = useState(true);
+  const [userRole, setUserRole] = useState(null);
 
   useEffect(() => {
+    const auth = getAuth();
     const unsubscribe = onAuthStateChanged(auth, user => {
-      setCurrentUser(user);
-      setLoading(false);
+      if (user) {
+        setCurrentUser(user);
+        // Determine user role based on email or other criteria
+        setUserRole(user.email === "admin@mail.com" ? "admin" : "user");
+        
+      } else {
+        setCurrentUser(null);
+        setUserRole(null);
+      }
     });
 
-    return unsubscribe; // Unsubscribe on unmount
+    return unsubscribe;
   }, []);
 
-  const value = {
-    currentUser
-  };
-
   return (
-    <AuthContext.Provider value={value}>
-      {!loading && children}
+    <AuthContext.Provider value={{ currentUser, userRole, setCurrentUser, setUserRole }}>
+      {children}
     </AuthContext.Provider>
   );
+}
+
+export function useAuth() {
+  return useContext(AuthContext);
 }

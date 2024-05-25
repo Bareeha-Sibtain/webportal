@@ -6,30 +6,33 @@ import Login from './pages/LoginPage';
 import Signup from './pages/Signup';
 import HomePage from './pages/Homepage';
 import History from './pages/History';
-import UserDetail from './pages/UserContact';
+import UserContact from './pages/UserContact';
+import AdminDashboard from './pages/AdminDashboard';
+import AdminHome from './pages/AdminHome';
+import Details from './pages/Details';
+import UserProfile from './pages/UserProfile'
+import Header from './component/Header';
+import Users from './pages/Users';
 
-function PrivateRoute({ children }) {
-  const { currentUser } = useAuth();
-  return currentUser ? children : <Navigate to="/login" />;
-}
+
 
 function App() {
   return (
     <Router>
-      <AuthProvider>
-        <Navbar />  
+      <AuthProvider> 
         <Routes>
-          <Route path="/login" element={<Login />} />
+          <Route path="/" element={<Login />} />
           <Route path="/signup" element={<Signup />} />
-          <Route path="/home" element={
-            <PrivateRoute>
-              <HomePage />
-            </PrivateRoute>
-          }/>
-          <Route path="/" element={<Navigate to="/home" replace />} />
-          <Route path="history" element={<History />} />
-          <Route path="user" element={<UserDetail />} />
-          {/* <Route path="setting" element={<History />} /> */}
+          <Route path='/admin' element={<AdminHome />}>
+              <Route index  element={<Details />}/>
+              <Route path='editdevice'  element={<AdminDashboard />}/>
+              <Route path='userdetails' element={< Users/>}/>
+          </Route>
+          <Route path='/user' element={<HomePage />}>
+              <Route index element={<Header />} />
+              <Route path='neighbour' element={<UserContact /> } />
+              <Route path='profile' element={<UserProfile /> } />
+          </Route>
         </Routes>
       </AuthProvider>
     </Router>

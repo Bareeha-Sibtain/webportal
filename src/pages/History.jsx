@@ -1,14 +1,35 @@
 import React, { useEffect, useState } from 'react';
 import { ref, onValue } from "firebase/database";
-import { useAuth } from '../context/AuthContext'; // Make sure this is correctly imported
-import { realTimeDb } from '../firebase/firebase'; // Ensure this is correctly imported
+import { doc, getDoc } from 'firebase/firestore';
+import { useAuth } from '../context/AuthContext';
+import { realTimeDb, db } from '../firebase/firebase';
 
 const HistoryPage = () => {
     const [notifications, setNotifications] = useState([]);
-    const [isLoading, setIsLoading] = useState(true); // Loading state
+    const [isLoading, setIsLoading] = useState(true);
     const { currentUser } = useAuth();
+    const [userName, setUserName] = useState('');
 
     useEffect(() => {
+        const fetchUserDetails = async () => {
+            if (currentUser) {
+                const userDocRef = doc(db, "users", currentUser.uid);
+                const userDoc = await getDoc(userDocRef);
+                if (userDoc.exists()) {
+                    const userData = userDoc.data();
+                    setUserName(userData.name);
+                } else {
+                    alert("User document not found");
+                }
+            }
+        };
+
+        fetchUserDetails();
+    }, [currentUser]);
+
+    useEffect(() => {
+        if (!userName) return; // Wait until the username is fetched
+
         const notificationsRef = ref(realTimeDb, 'Notifications');
 
         const unsubscribe = onValue(notificationsRef, snapshot => {
@@ -16,7 +37,7 @@ const HistoryPage = () => {
             const notificationsList = [];
             if (data) {
                 for (const key in data) {
-                    if (data[key].user === currentUser.displayName) {
+                    if (data[key].name === userName) {
                         notificationsList.push({
                             id: key,
                             ...data[key]
@@ -25,18 +46,16 @@ const HistoryPage = () => {
                 }
             }
             setNotifications(notificationsList);
-            setIsLoading(false); // Update loading state
-        }, {
-            onlyOnce: true // Fetch data only once; remove if continuous sync is needed
+            setIsLoading(false);
         });
 
         return () => {
             unsubscribe();
         };
-    }, [currentUser]);
+    }, [userName]);
 
     if (isLoading) {
-        return <div>Loading...</div>; // Display loading indicator
+        return <div>Loading...</div>;
     }
 
     return (
@@ -51,7 +70,7 @@ const HistoryPage = () => {
                     </div>
                 ))
             ) : (
-                <p>No notifications found.</p> // Handle empty state
+                <p>No notifications found.</p>
             )}
         </div>
     );

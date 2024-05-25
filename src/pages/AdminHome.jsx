@@ -1,13 +1,17 @@
 import { MenuFoldOutlined, MenuUnfoldOutlined } from "@ant-design/icons";
-import { AiFillProfile } from "react-icons/ai";
+import {
+  AiOutlineDashboard,
+} from "react-icons/ai";
 import { FaUser } from "react-icons/fa";
-import { Button, Layout, Menu } from "antd";
+import { Button, Layout, Menu, theme } from "antd";
+import { MdPermDeviceInformation } from "react-icons/md";
 import { useState } from "react";
 import { Outlet, useNavigate } from "react-router-dom";
-import { BiSolidHome } from "react-icons/bi";
 import { getAuth, signOut } from "firebase/auth";
-const HomePage = () => {
+
+const AdminHome = () => {
   const { Header, Sider, Content } = Layout;
+ 
   
   let iconStyles = { color: "white" };
   const navigate = useNavigate();
@@ -33,7 +37,7 @@ const HomePage = () => {
         <Sider trigger={null} collapsible collapsed={collapsed}>
           <div className="bg-[#001529] py-4">
             <h2 className="text-white fs-5 text-center mb-0">
-              <span className="text-bold text-xl capitalize">TheftGuard</span>
+              <span className="text-bold text-xs sm:text-sm md:text-base lg:text-xl capitalize">TheftGuard</span>
             </h2>
           </div>
           <Menu
@@ -43,7 +47,6 @@ const HomePage = () => {
             defaultSelectedKeys={[""]}
             onClick={({ key }) => {
               if (key === "signout") {
-                handleLogout();
               } else {
                 navigate(key);
               }
@@ -51,28 +54,26 @@ const HomePage = () => {
             items={[
               {
                 key: "",
-                icon: <BiSolidHome className="fs-5 " />,
-                label: "Home",
+                icon: <AiOutlineDashboard className="fs-5 " />,
+                label: "Dashboard",
               },
               {
-                key: "neighbour",
-                icon: <FaUser className="fs-5" style={iconStyles} />,
-                label: "Neighbour's Contact",
+                key: "editdevice",
+                icon: <MdPermDeviceInformation className="fs-5 " />,
+                label: "Edit Device",
               },
               {
-                key: "profile",
-                icon: <AiFillProfile className="fs-5" style={iconStyles} />,
-                label: "Profile",
+                key: "userdetails",
+                icon: <FaUser className="fs-5" style={{ iconStyles }} />,
+                label: "Users",
               },
             ]}
           />
         </Sider>
         <Layout>
           <Header
-            className="flex flex-row gap-3 items-start justify-start "
-            style={{
-              padding: 0,
-            }}
+            className="flex justify-start items-start px-2  h-50"
+           
           >
             <Button
               type="text"
@@ -85,21 +86,13 @@ const HomePage = () => {
                 background: "#fff",
               }}
             />
-            <div className="flex flex-row gap-3 items-start justify-start">
-              <div>
-                <button className="bg-indigo-300 w-20 rounded" onClick={handleLogout}>
-                  Logout
-                </button>
-              </div>
-
-             
-            </div>
+              <button className="bg-indigo-300 rounded ms-5 w-20" onClick={handleLogout}>Logout</button>     
           </Header>
           <Content
             style={{
               margin: "24px 16px",
               padding: 24,
-              minHeight: "100%",
+              minHeight: 280,
             }}
           >
             <Outlet />
@@ -110,4 +103,4 @@ const HomePage = () => {
   );
 };
 
-export default HomePage;
+export default AdminHome;

@@ -1,33 +1,42 @@
-import { useState } from "react";
-import { NavLink, useNavigate } from "react-router-dom";
-import { signInWithEmailAndPassword } from "firebase/auth"; // Import signIn method
-import { auth } from "../firebase/firebase"; // Make sure you have the correct path
+import React, { useState } from 'react';
+import { NavLink, useNavigate } from 'react-router-dom';
+import { getAuth, signInWithEmailAndPassword } from 'firebase/auth';
+import { useAuth } from '../context/AuthContext';
 
-export default function Login() {
-  const [email, setEmail] = useState("");
-  const [password, setPassword] = useState("");
-
-  const router = useNavigate()
+function Login() {
+  const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
+  const navigate = useNavigate();
+  const auth = getAuth();
+  const { setCurrentUser, setUserRole } = useAuth();
 
   const handleLogin = async (event) => {
-    event.preventDefault(); // Prevent the default form submission behavior
+    event.preventDefault();
     try {
-      await signInWithEmailAndPassword(auth, email, password);
-      console.log("Logged in successfully");
-      // Redirect to another page or dashboard
-      router("/home")
+      const userCredential = await signInWithEmailAndPassword(auth, email, password);
+      const user = userCredential.user;
+      setCurrentUser(user);
+
+      if (email === "admin@mail.com") {
+        setUserRole("admin");
+        navigate('/admin');
+        alert("Welcome Admin");
+      } else {
+        setUserRole("user");
+        navigate("/user");
+        alert("Welcome User");
+      }
     } catch (error) {
       console.error("Failed to login:", error.message);
-      alert("Failed to login: " + error.message); // Display error message to the user
+      alert("Failed to login: " + error.message);
     }
   };
 
   return (
-    <main className='h-96 w-96 mx-auto mt-24 rounded shadow'>
-      <div className=' rounded shadow p-10 border-2 text-center'>
+    <div className='w-85 flex flex-col justify-center items-center mx-auto h-[100vh] border-2 text-center'>
         <h3 className='font-bold text-3xl'>Login</h3>
-        <div className='p-4 bg-black rounded mt-6'>
-          <form className='bg-white p-3 mt-6 rounded-md shadow' onSubmit={handleLogin}>
+        <div className='p-4 w-72 rounded mt-6'>
+          <form className='bg-white p-3 w-72 mt-6 rounded-md shadow-md' onSubmit={handleLogin}>
             <div className='flex flex-col items-start p-2 mt-4'>
               <input type='email' placeholder='Email' autoComplete='off' className='outline-none border-b-2 w-full text-xs text-[#000]' required onChange={(e)=> setEmail(e.target.value)}  /> 
             </div>
@@ -39,6 +48,7 @@ export default function Login() {
           </form>
         </div>
       </div>
-    </main>
-  )
+  );
 }
+
+export default Login;
