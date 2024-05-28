@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import './style.css';
+import { toast } from 'react-toastify';
 
 const DeviceForm = ({ show, handleClose, device, updateDevice, users }) => {
   const [userData, setUserData] = useState({
@@ -37,6 +38,7 @@ const DeviceForm = ({ show, handleClose, device, updateDevice, users }) => {
     e.preventDefault();
     updateDevice(device.key, userData);
     handleClose();
+    toast.success("Successfully! Assign the Device to User")
   };
 
   return (

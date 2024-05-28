@@ -7,3 +7,10 @@
 .blink-animation {
     animation: blink 1s infinite; /* Adjust timing as needed */
 }
+
+.fontFamily{
+    font-family: cursive;
+}
+.ant-layout{
+    height: 100% !important;
+}

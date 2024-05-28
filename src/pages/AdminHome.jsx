@@ -8,6 +8,7 @@ import { MdPermDeviceInformation } from "react-icons/md";
 import { useState } from "react";
 import { Outlet, useNavigate } from "react-router-dom";
 import { getAuth, signOut } from "firebase/auth";
+import logo from '../assets/image/logo.jpeg'
 
 const AdminHome = () => {
   const { Header, Sider, Content } = Layout;
@@ -35,11 +36,10 @@ const AdminHome = () => {
     <>
       <Layout className="h-[100vh]">
         <Sider trigger={null} collapsible collapsed={collapsed}>
-          <div className="bg-[#001529] py-4">
-            <h2 className="text-white fs-5 text-center mb-0">
-              <span className="text-bold text-xs sm:text-sm md:text-base lg:text-xl capitalize">TheftGuard</span>
-            </h2>
-          </div>
+        <div className="flex flex-col justify-center items-center mx-auto mt-5">
+              <img src={logo} alt="logo"  width={50} height={50}/>
+              <span className="text-sm md:text-xl text-white capitalize fontFamily">TheftGuard</span>
+              </div>
           <Menu
             className="mt-5 h-[100vh]"
             theme="dark"

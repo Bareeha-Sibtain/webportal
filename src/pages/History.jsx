@@ -3,41 +3,23 @@ import { ref, onValue } from "firebase/database";
 import { doc, getDoc } from 'firebase/firestore';
 import { useAuth } from '../context/AuthContext';
 import { realTimeDb, db } from '../firebase/firebase';
+import Spinner from '../component/Spinner';
 
 const HistoryPage = () => {
     const [notifications, setNotifications] = useState([]);
     const [isLoading, setIsLoading] = useState(true);
     const { currentUser } = useAuth();
-    const [userName, setUserName] = useState('');
+    const notificationsRef = ref(realTimeDb, 'Notifications');
 
     useEffect(() => {
-        const fetchUserDetails = async () => {
-            if (currentUser) {
-                const userDocRef = doc(db, "users", currentUser.uid);
-                const userDoc = await getDoc(userDocRef);
-                if (userDoc.exists()) {
-                    const userData = userDoc.data();
-                    setUserName(userData.name);
-                } else {
-                    alert("User document not found");
-                }
-            }
-        };
-
-        fetchUserDetails();
-    }, [currentUser]);
-
-    useEffect(() => {
-        if (!userName) return; // Wait until the username is fetched
-
-        const notificationsRef = ref(realTimeDb, 'Notifications');
+        if (!currentUser) return; // Wait until the username is fetched
 
         const unsubscribe = onValue(notificationsRef, snapshot => {
             const data = snapshot.val();
             const notificationsList = [];
             if (data) {
                 for (const key in data) {
-                    if (data[key].name === userName) {
+                    if (data[key].uid === currentUser.uid) {
                         notificationsList.push({
                             id: key,
                             ...data[key]
@@ -52,14 +34,15 @@ const HistoryPage = () => {
         return () => {
             unsubscribe();
         };
-    }, [userName]);
+    }, [currentUser]);
 
     if (isLoading) {
-        return <div>Loading...</div>;
+        return <Spinner />
     }
 
     return (
         <div className="flex flex-col items-center justify-center mt-4">
+            <h2 className='text-xl text-black mb-5 font-bold'>Notification History</h2>
             {notifications.length > 0 ? (
                 notifications.map(notification => (
                     <div key={notification.id} className="bg-white shadow-lg rounded-lg p-6 mb-4 w-full md:w-1/2">
@@ -70,10 +53,11 @@ const HistoryPage = () => {
                     </div>
                 ))
             ) : (
-                <p>No notifications found.</p>
+                <p className='text-base  bg-indigo-400 px-3 py-2 rounded text-white animate-pulse'>No notifications found.</p>
             )}
         </div>
     );
 };
+
 
 export default HistoryPage;

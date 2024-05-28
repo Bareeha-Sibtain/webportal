@@ -3,18 +3,22 @@ import DeviceForm from '../component/DeviceForm';
 import { realTimeDb, db } from '../firebase/firebase';
 import { ref, onValue, set } from 'firebase/database';
 import { collection, getDocs } from 'firebase/firestore';
+import Spinner from '../component/Spinner';
+
 
 export default function AdminDashboard() {
   const [openModal, setOpenModal] = useState(false);
   const [devices, setDevices] = useState({});
   const [selectedDevice, setSelectedDevice] = useState(null);
   const [users, setUsers] = useState([]);
+  const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
     // Fetch devices from Realtime Database
     const deviceRef = ref(realTimeDb, 'Device');
     onValue(deviceRef, (snapshot) => {
       setDevices(snapshot.val());
+      setIsLoading(false)
     });
 
     // Fetch users from Firestore
@@ -31,6 +35,11 @@ export default function AdminDashboard() {
 
     fetchUsers();
   }, []);
+
+  if (isLoading) {
+    return <Spinner />
+}
+
 
   const handleOpenModal = (deviceKey) => {
     setSelectedDevice({ key: deviceKey, ...devices[deviceKey] });

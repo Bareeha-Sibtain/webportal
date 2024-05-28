@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { collection, getDocs } from "firebase/firestore";
 import { db } from '../firebase/firebase'; // Adjust the import path as necessary
+import Spinner from '../component/Spinner';
 
 const UserDetail = () => {
     const [users, setUsers] = useState([]);
@@ -32,7 +33,7 @@ const UserDetail = () => {
         <div className="p-5">
             <div className="grid grid-cols-1 md:grid-cols-3 gap-4 bg-[#001529] rounded-md px-6 py-7 ">
                 {isLoading ? (
-                    <p className='text-white font-bold text-3xl'>Loading...</p>
+                    <Spinner />
                 ) : users.length > 0 ? (
                     users.map(user => (
                         

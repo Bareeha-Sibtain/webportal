@@ -3,9 +3,12 @@ import { realTimeDb } from '../firebase/firebase';
 import { onValue, ref } from 'firebase/database';
 import { RiAlertFill } from 'react-icons/ri';
 import './style.css'
+import Spinner from '../component/Spinner';
+
 
 export default function Details() {
     const [deviceInfo, setDeviceInfo] = useState({});
+    const [isLoading, setIsLoading] = useState(true);
 
     useEffect(() => {
         const deviceRef = ref(realTimeDb, 'Device');
@@ -13,15 +16,21 @@ export default function Details() {
             const devices = snapshot.val();
             setDeviceInfo(devices);
             console.log(devices.motion);
+            setIsLoading(false)
         });
+    
     }, []);
 
-    // const getStatusStyle = (status) => {
-    //     return {
-    //         backgroundColor: status === 0 ? 'green' : 'red',
-    //         color: 'white'
-    //     };
-    // };
+    if (isLoading) {
+        return <Spinner />
+    }
+
+    const getStatusStyle = (status) => {
+        return {
+            backgroundColor: status === 1 ? 'green' : 'red',
+            color: 'white'
+        };
+    };
 
     return (
         <div className='flex justify-center items-center mx-auto mt-20 px-4 sm:px-6 lg:px-8'>
@@ -41,7 +50,7 @@ export default function Details() {
                             <tr key={key} className={deviceInfo[key].motion.value === 1 || deviceInfo[key].sound.value === 1 ? 'blink-animation' : ''}>
                                 <td className="border border-slate-300 px-2 sm:px-3 py-2 sm:py-3 text-xs sm:text-base">{key}</td>
                                 <td className="border border-slate-300 px-2 sm:px-3 py-2 sm:py-3 text-xs sm:text-base">
-                                    <p className='w-10 h-10 text-center p-2'>
+                                    <p className='w-10 h-10 text-center p-2 rounded-full flex justify-center items-center'  style={getStatusStyle(deviceInfo[key].system_status)}>
                                         {deviceInfo[key].system_status === 0 ? `OFF` : `ON`}
                                     </p>
                                 </td>
