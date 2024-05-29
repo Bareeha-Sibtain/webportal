@@ -77,8 +77,7 @@ const Header = () => {
         setDeviceKey(home)
         // console.log(`devicekey : ${device[home]}`);
         // console.log(`Motion: ${motion}, Sound: ${sound}, User:`, user); // Log details of each device
-
-    
+        if(device.system_status === 1){
           if (motion === 1 || sound === 1) {
             setNotification({
               title: 'Alert',
@@ -94,6 +93,7 @@ const Header = () => {
             }, 3600000); // 1 hour in milliseconds
             setNotificationTimeout(timeout);
           }
+        }
         
       }
     });
